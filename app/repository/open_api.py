@@ -1,10 +1,13 @@
 
 from openai import OpenAI
 from app.repository.llm import  qa_chain
+from app.core.config import settings
 
-def get_response_from_context(prompt: str )->str:
+def get_response_from_context(prompt: str, secret_key: str)->str:
+    if secret_key != settings.SECRET_KEY:
+        raise RuntimeError("Invalid secret key")
     try:
-        context = get_context_from_query(prompt)
+        context = get_context_from_query(prompt, secret_key)
         result=qa_chain({"query":prompt})
         return result["result"]
     except Exception as e:
@@ -12,7 +15,9 @@ def get_response_from_context(prompt: str )->str:
         
 
 
-def get_response_from_openai(prompt: str):
+def get_response_from_openai(prompt: str, secret_key: str):
+    if secret_key != settings.SECRET_KEY:
+        raise RuntimeError("Invalid secret key")
     client = OpenAI()
     model: str = "gpt-3.5-turbo"
 
@@ -23,7 +28,7 @@ def get_response_from_openai(prompt: str):
                 {"role": "system", "content": "You are a helpful assistant"},
                 {"role": "user", "content": prompt},
             ],
-            max_tokens=60  # Limite de palabras
+            max_tokens=100  # Limite de palabras
         )
 
     response = completion.choices[0].message.content.strip()
@@ -32,7 +37,9 @@ def get_response_from_openai(prompt: str):
     return response
 
 
-def get_context_from_query(prompt: str, ):
+def get_context_from_query(prompt: str, secret_key: str):
+    if secret_key != settings.SECRET_KEY:
+        raise RuntimeError("Invalid secret key")
     client = OpenAI()
     # allowed_responses = ["moneyReceived", "moneyGiven", "moneyBalance", "invalidQuery"]
     model: str = "gpt-3.5-turbo"

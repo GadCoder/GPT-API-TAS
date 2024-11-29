@@ -8,15 +8,15 @@ router = APIRouter()
 
 
 @router.post("/query")
-async def handle_query(query_model: ChatRequest, from_context: bool = Query(False)):
+async def handle_query(query_model: ChatRequest, secret_key: str, from_context: bool = Query(False)):
     try:
         
         if from_context:
             # Use retrieval-based query
-            answer = get_response_from_context(query_model.prompt)
+            answer = get_response_from_context(query_model.prompt, secret_key=secret_key)
         else:
             # Use direct OpenAI-based query
-            answer = get_response_from_openai(query_model.prompt)
+            answer = get_response_from_openai(query_model.prompt, secret_key=secret_key)
 
         return {"query": query_model.prompt, "answer": answer}
     except RuntimeError as e:
@@ -25,9 +25,9 @@ async def handle_query(query_model: ChatRequest, from_context: bool = Query(Fals
 
 
 @router.post("/get-context-from-query/")
-async def handle_query(query_model: ChatRequest):
+async def handle_query(query_model: ChatRequest, secret_key: str):
     try:
-        answer = get_context_from_query(query_model.prompt)
+        answer = get_context_from_query(query_model.prompt, secret_key=secret_key)
         return {"query": query_model.prompt, "context": answer}
     except RuntimeError as e:
         # Handle errors in processing queries
