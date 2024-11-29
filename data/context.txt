@@ -1,0 +1,6 @@
+alumnos de la fisi{
+    juan
+    pepe
+    pedro
+    juancho
+}
